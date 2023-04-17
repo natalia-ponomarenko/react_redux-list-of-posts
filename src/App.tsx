@@ -8,43 +8,34 @@ import { PostsList } from './components/PostsList';
 import { PostDetails } from './components/PostDetails';
 import { UserSelector } from './components/UserSelector';
 import { Loader } from './components/Loader';
-import { getUserPosts } from './api/posts';
 import { Post } from './types/Post';
 import { Counter } from './features/counter/Counter';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import * as usersActions from './features/users/users';
+import * as postsActions from './features/posts/posts';
 
 export const App: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [hasError, setError] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  const { author } = useAppSelector((state) => state.author);
   const dispatch = useAppDispatch();
+  const { author } = useAppSelector((state) => state.author);
+  const {
+    items: posts,
+    loaded,
+    hasError,
+  } = useAppSelector((state) => state.posts);
 
   useEffect(() => {
     dispatch(usersActions.init());
   }, []);
 
-  function loadUserPosts(userId: number) {
-    setLoaded(false);
-
-    getUserPosts(userId)
-      .then(setPosts)
-      .catch(() => setError(true))
-      .finally(() => setLoaded(true));
-  }
-
   useEffect(() => {
-    // we clear the post when an author is changed
-    // not to confuse the user
     setSelectedPost(null);
 
     if (author) {
-      loadUserPosts(author.id);
+      dispatch(postsActions.init(author.id));
     } else {
-      setPosts([]);
+      dispatch(postsActions.setPosts([]));
     }
   }, [author?.id]);
 
@@ -81,7 +72,7 @@ export const App: React.FC = () => {
                   </div>
                 )}
 
-                {author && loaded && !hasError && posts.length === 0 && (
+                {author && loaded && !hasError && !posts.length && (
                   <div className="notification is-warning" data-cy="NoPostsYet">
                     No posts yet
                   </div>

@@ -1,45 +1,24 @@
-// /* eslint-disable no-param-reassign */
-// import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-// import { User } from '../../types/User';
-
-// type AuthorState = {
-//   author: User | null;
-// };
-
-// const initialState: AuthorState = {
-//   author: null,
-// };
-
-// const authorSlice = createSlice({
-//   name: 'author',
-//   initialState,
-//   reducers: {
-//     setAuthor: (state, action: PayloadAction<User>) => {
-//       state.author = action.payload;
-//     },
-//   },
-// });
-
-// export default authorSlice.reducer;
-// export const { setAuthor } = authorSlice.actions;
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+/* eslint-disable no-param-reassign */
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { User } from '../../types/User';
 
-type State = { author: User | null };
+type AuthorState = {
+  author: User | null;
+};
 
-const initialState: State = { author: null };
+const initialState: AuthorState = {
+  author: null,
+};
 
 const authorSlice = createSlice({
   name: 'author',
   initialState,
   reducers: {
     setAuthor: (state, action: PayloadAction<User>) => {
-      /* eslint-disable no-param-reassign */
       state.author = action.payload;
     },
-
   },
 });
 
-export const { setAuthor } = authorSlice.actions;
 export default authorSlice.reducer;
+export const { setAuthor } = authorSlice.actions;
