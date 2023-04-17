@@ -1,37 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { User } from '../types/User';
-import { getUsers } from '../api/users';
-import { actions as usersActions } from '../features/users/usersSlice';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { Loader } from './Loader';
+import { setAuthor } from '../features/author/author';
 
-type Props = {
-  value: User | null;
-  onChange: (user: User) => void;
-};
-
-export const UserSelector: React.FC<Props> = ({
-  // `value` and `onChange` are traditional names for the form field
-  // `selectedUser` represents what actually stored here
-  value: selectedUser,
-  onChange,
-}) => {
+export const UserSelector: React.FC = () => {
   const [expanded, setExpanded] = useState(false);
-  const dispatch = useAppDispatch();
-  const { users, loading, error } = useAppSelector(state => state.users);
 
-  useEffect(() => {
-    dispatch(usersActions.setLoading(true));
-    getUsers()
-      .then(usersFromServer => {
-        dispatch(usersActions.set(usersFromServer));
-      })
-      .catch(() => {
-        dispatch(usersActions.setError('Something went wrong'))
-      })
-      .finally(() => dispatch(usersActions.setLoading(false)));
-  }, []);
+  const { users, loading, error } = useAppSelector((state) => state.users);
+  const selectedUser = useAppSelector((state) => state.author.author);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!expanded) {
@@ -62,7 +40,7 @@ export const UserSelector: React.FC<Props> = ({
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={() => {
-            setExpanded(current => !current);
+            setExpanded((current) => !current);
           }}
         >
           <span>
@@ -77,16 +55,14 @@ export const UserSelector: React.FC<Props> = ({
 
       <div className="dropdown-menu" id="dropdown-menu" role="menu">
         <div className="dropdown-content">
-          {loading && (
-            <Loader />
-          )}
+          {loading && <Loader />}
           {!error ? (
-            users.map(user => (
+            users.map((user) => (
               <a
                 key={user.id}
                 href={`#user-${user.id}`}
                 onClick={() => {
-                  onChange(user);
+                  dispatch(setAuthor(user));
                 }}
                 className={classNames('dropdown-item', {
                   'is-active': user.id === selectedUser?.id,
